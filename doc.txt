@@ -1,3 +1,54 @@
 https://khoapham.vn/KhoaPhamTraining/nodejs/snippet/
 
 https://www.youtube.com/watch?v=ZU3LmxD2INk
+
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import * as io from 'socket.io-client';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ChatService {
+  private socket: SocketIOClient.Socket;
+  lstUserConnect = [];
+
+
+  constructor() {
+    this.socket = io('http://localhost:3000');
+  }
+
+  sendMessage(msg: string) {
+    this.socket.emit('client-send-message', { message: msg });
+  }
+
+  registerUsername(username: string) {
+    this.socket.emit('client-register-username', { username: username }, function (callback, lstUser) {
+      if (callback) {
+        alert('Register success!');
+        this.lstUserConnect = lstUser;
+      } else {
+        alert('Register faild!');
+      }
+    });
+  }
+
+  getLstUsername(): Observable<any> {
+    // tslint:disable-next-line: deprecation
+    return Observable.create((observer) => {
+      this.socket.on('server-send-lstusername', lstuser => {
+        observer.next(lstuser);
+      });
+    });
+  }
+
+
+  getMessage(): Observable<any> {
+    // tslint:disable-next-line: deprecation
+    return Observable.create((observer) => {
+      this.socket.on('server-send-message', message => {
+        observer.next(message);
+      });
+    });
+  }
+}
