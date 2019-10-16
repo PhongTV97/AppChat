@@ -2,7 +2,6 @@ var express = require("express");
 var app = express();
 var server = require("http").createServer(app);
 var io = require("socket.io").listen(server);
-var fs = require("fs");
 var countConnect = 0;
 server.listen(process.env.PORT || 3000);
 var lstusername = [];
@@ -17,7 +16,8 @@ io.sockets.on('connection', function (socket) { // mở kết nối client và s
 
   // server lắng nghe
   socket.on('client-send-message', function (data) {
-    io.sockets.emit('server-send-message', { content: {username: socket.un, message: data.message} });
+    let date_ob = new Date();
+    io.sockets.emit('server-send-message', { content: {username: socket.un, message: data.message, time: date_ob} });
   });
 
 
